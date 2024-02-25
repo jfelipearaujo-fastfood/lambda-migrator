@@ -18,6 +18,8 @@ module "db" {
   username = var.database_username
   port     = var.database_port
 
-  db_subnet_group_name   = module.vpc.database_subnet_group
+  create_db_subnet_group = false
+  subnet_ids             = module.vpc.private_subnets
+
   vpc_security_group_ids = [module.security_group.security_group_id]
 }

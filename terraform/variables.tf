@@ -1,13 +1,3 @@
-variable "access_key" {
-  description = "The AWS access key"
-  default     = "default"
-}
-
-variable "secret_key" {
-  description = "The AWS secret key"
-  default     = "default"
-}
-
 variable "region" {
   description = "The default region to use for AWS"
   default     = "us-east-1"
@@ -23,7 +13,7 @@ variable "tags" {
 
 variable "project_name" {
   description = "The name of the project"
-  default     = "fastfood"
+  default     = "fast-food"
 }
 
 variable "database_port" {

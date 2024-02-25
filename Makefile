@@ -1,7 +1,7 @@
 init:
 	@echo "Initializing..."
 	@cd terraform \
-		&& terraform init
+		&& terraform init -reconfigure
 
 plan:
 	@echo "Planning..."
