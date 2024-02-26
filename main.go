@@ -30,12 +30,6 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		bucket := record.S3.Bucket.Name
 		key := record.S3.Object.URLDecodedKey
 
-		// check if file extension is .sql
-		if len(key) < 4 || key[len(key)-4:] != ".sql" {
-			slog.WarnContext(ctx, "skipping file, maybe not a .sql", "bucket", bucket, "key", key)
-			continue
-		}
-
 		slog.Info("processing the object", "bucket", bucket, "key", key)
 
 		slog.Info("getting the object")

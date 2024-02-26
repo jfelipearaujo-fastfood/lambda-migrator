@@ -70,11 +70,11 @@ resource "aws_iam_policy" "lambda_policy_s3" {
     Statement = [{
       Action   = "s3:GetObject",
       Effect   = "Allow",
-      Resource = "${data.aws_s3_bucket.bucket.arn}/migrations/*"
+      Resource = data.aws_s3_bucket.bucket.arn
       }, {
       Action   = "s3:DeleteObject",
       Effect   = "Allow",
-      Resource = "${data.aws_s3_bucket.bucket.arn}/migrations/*"
+      Resource = data.aws_s3_bucket.bucket.arn
     }]
   })
 }
