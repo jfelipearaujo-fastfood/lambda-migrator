@@ -40,7 +40,7 @@ resource "aws_lambda_permission" "lambda_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = "${data.aws_s3_bucket.bucket.arn}/migrations/*"
+  source_arn    = data.aws_s3_bucket.bucket.arn
 }
 
 resource "aws_iam_role" "lambda_role" {
