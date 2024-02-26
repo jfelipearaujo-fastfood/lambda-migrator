@@ -44,4 +44,4 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: terraform destroy -input=false -auto-approve \
-          -var="bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
+          -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"

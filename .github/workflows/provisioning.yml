@@ -63,7 +63,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Upload script files
-        run: aws s3 cp scripts/ s3://${{ secrets.AWS_BUCKET_NAME }}/migrations --recursive
+        run: aws s3 cp scripts/ s3://${{ secrets.AWS_BUCKET_TF_STATE }}/migrations --recursive
 
   deploy:
     needs: 
@@ -119,4 +119,4 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: terraform apply -input=false -auto-approve \
-          -var="bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
+          -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"
