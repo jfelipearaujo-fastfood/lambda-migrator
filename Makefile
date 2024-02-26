@@ -1,3 +1,11 @@
+build:
+	@echo "Building..."
+	@env GOOS=linux GOARCH=arm64 go build -o terraform/bootstrap main.go
+
+zip:
+	@echo "Zipping..."
+	@zip terraform/lambda.zip terraform/bootstrap
+
 init:
 	@echo "Initializing..."
 	@cd terraform \
