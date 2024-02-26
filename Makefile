@@ -3,6 +3,10 @@ init:
 	@cd terraform \
 		&& terraform init -reconfigure
 
+check:
+	@echo "Checking..."
+	make fmt && make validate && make plan
+
 plan:
 	@echo "Planning..."
 	@cd terraform \

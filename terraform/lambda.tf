@@ -17,7 +17,7 @@ resource "aws_lambda_function" "lambda_function" {
     variables = {
       DB_HOST     = module.db.db_instance_address
       DB_PORT     = var.database_port
-      DB_NAME     = var.database_name
+      DB_NAME     = module.db.db_instance_identifier
       DB_USERNAME = var.database_username
       DB_PASSWORD = jsondecode(aws_secretsmanager_secret_version.sm_database_credentials_version.secret_string)["password"]
     }
@@ -27,7 +27,7 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "lambda_role"
+  name = "role-${var.lambda_name}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -37,7 +37,16 @@ resource "aws_iam_role" "lambda_role" {
       Principal = {
         Service = "lambda.amazonaws.com"
       }
-      }, {
+    }]
+  })
+}
+
+resource "aws_iam_policy" "lambda_policy_s3" {
+  name = "policy-${var.lambda_name}"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
       Action   = "s3:GetObject",
       Effect   = "Allow",
       Resource = "${data.aws_s3_bucket.bucket.arn}/migrations/*"
@@ -50,7 +59,13 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_policy_attachment" "lambda_policy_attachment" {
-  name       = "lambda_policy_attachment"
+  name       = "policy-attachment-${var.lambda_name}"
   roles      = [aws_iam_role.lambda_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_policy_attachment" "lambda_policy_attachment_s3" {
+  name       = "policy-attachment-s3-${var.lambda_name}"
+  roles      = [aws_iam_role.lambda_role.name]
+  policy_arn = aws_iam_policy.lambda_policy_s3.arn
 }
