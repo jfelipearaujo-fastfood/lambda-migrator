@@ -16,7 +16,7 @@ module "db" {
   iam_database_authentication_enabled = false
 
   db_name           = var.database_name
-  username          = var.database_username
+  username          = local.db_username
   password          = local.db_password
   port              = var.database_port
   apply_immediately = true
