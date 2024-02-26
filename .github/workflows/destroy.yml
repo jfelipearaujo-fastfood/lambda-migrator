@@ -38,11 +38,9 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -input=false \
-          -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"
+        run: terraform plan -input=false -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"
         continue-on-error: true
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        run: terraform destroy -input=false -auto-approve \
-          -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"
+        run: terraform destroy -input=false -auto-approve -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"
