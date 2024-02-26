@@ -36,7 +36,10 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			continue
 		}
 
-		// get the object
+		slog.Info("processing the object", "bucket", bucket, "key", key)
+
+		slog.Info("getting the object")
+
 		raw, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
 			Bucket: &bucket,
 			Key:    &key,
@@ -46,7 +49,8 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			return err
 		}
 
-		// read the object data
+		slog.Info("reading the object")
+
 		buf := new(bytes.Buffer)
 		_, err = buf.ReadFrom(raw.Body)
 		if err != nil {
@@ -66,6 +70,8 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		// connect to the database
 		connectionStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 
+		slog.Info("connecting to the database")
+
 		conn, err := sql.Open("postgres", connectionStr)
 		if err != nil {
 			slog.ErrorContext(ctx, "error while trying to connect to the database", "error", err)
@@ -74,20 +80,26 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		defer conn.Close()
 
 		// execute the sql
+		slog.Info("executing the query")
+
 		_, err = conn.Exec(data)
 		if err != nil {
 			slog.ErrorContext(ctx, "error while trying to execute the query", "error", err)
 		}
 
+		slog.Info("deleting the object")
+
 		// delete the object
-		// _, err = s3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
-		// 	Bucket: &bucket,
-		// 	Key:    &key,
-		// })
-		// if err != nil {
-		// 	slog.ErrorContext(ctx, "error while trying to delete the object", "bucket", bucket, "key", key, "error", err)
-		// 	return err
-		// }
+		_, err = s3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
+			Bucket: &bucket,
+			Key:    &key,
+		})
+		if err != nil {
+			slog.ErrorContext(ctx, "error while trying to delete the object", "bucket", bucket, "key", key, "error", err)
+			return err
+		}
+
+		slog.Info("completed")
 	}
 
 	return nil
