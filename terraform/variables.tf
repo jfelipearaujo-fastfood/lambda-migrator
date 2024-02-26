@@ -29,11 +29,6 @@ variable "database_port" {
   default     = 5432
 }
 
-variable "database_username" {
-  description = "The username to use for the database"
-  default     = "fastfood"
-}
-
 variable "lambda_name" {
   description = "The name of the lambda function"
   default     = "lambda_migrator"
