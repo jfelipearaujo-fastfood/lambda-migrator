@@ -73,8 +73,11 @@ resource "aws_iam_policy" "lambda_policy_s3" {
         "s3:GetObject",
         "s3:DeleteObject"
       ],
-      Effect   = "Allow",
-      Resource = data.aws_s3_bucket.bucket.arn
+      Effect = "Allow",
+      Resource = [
+        data.aws_s3_bucket.bucket.arn,
+        "${data.aws_s3_bucket.bucket.arn}/*"
+      ]
     }]
   })
 }
