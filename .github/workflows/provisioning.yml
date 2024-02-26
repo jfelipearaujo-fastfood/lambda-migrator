@@ -109,7 +109,8 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false \
+          -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"
         continue-on-error: true
 
       - name: Terraform Plan Status
