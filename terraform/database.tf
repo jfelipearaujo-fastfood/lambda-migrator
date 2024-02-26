@@ -14,12 +14,10 @@ module "db" {
   allocated_storage     = 20
   max_allocated_storage = 30
 
-  db_name  = var.project_name
+  db_name  = var.database_name
   username = var.database_username
   port     = var.database_port
 
-  create_db_subnet_group = false
-  subnet_ids             = module.vpc.private_subnets
-
+  db_subnet_group_name   = module.vpc.database_subnet_group
   vpc_security_group_ids = [module.security_group.security_group_id]
 }

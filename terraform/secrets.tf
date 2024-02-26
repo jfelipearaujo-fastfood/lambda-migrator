@@ -6,7 +6,7 @@ resource "random_password" "database_password" {
 }
 
 resource "aws_secretsmanager_secret" "sm_database_credentials" {
-  name = "sm-${var.project_name}-credentials"
+  name = "sm-${var.project_name}-cred"
 }
 
 resource "aws_secretsmanager_secret_version" "sm_database_credentials_version" {

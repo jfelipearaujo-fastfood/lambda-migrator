@@ -11,9 +11,17 @@ variable "tags" {
   }
 }
 
+variable "bucket_name" {
+}
+
 variable "project_name" {
   description = "The name of the project"
-  default     = "fast-food"
+  default     = "fastfood"
+}
+
+variable "database_name" {
+  description = "The name of the project"
+  default     = "fastfood"
 }
 
 variable "database_port" {
@@ -24,4 +32,9 @@ variable "database_port" {
 variable "database_username" {
   description = "The username to use for the database"
   default     = "fastfood"
+}
+
+variable "lambda_name" {
+  description = "The name of the lambda function"
+  default     = "lambda_migrator"
 }

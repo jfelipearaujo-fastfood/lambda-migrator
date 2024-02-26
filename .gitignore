@@ -8,6 +8,12 @@
 # Lock
 .terraform.lock.hcl
 
+# Zip files
+*.zip
+
+# Build file
+bootstrap
+
 # Crash log files
 crash.log
 crash.*.log
