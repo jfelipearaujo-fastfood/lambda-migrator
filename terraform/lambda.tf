@@ -24,6 +24,11 @@ resource "aws_lambda_function" "lambda_function" {
   }
 
   source_code_hash = filebase64sha256("./lambda.zip")
+
+  vpc_config {
+    subnet_ids         = [module.vpc.database_subnets.0, module.vpc.database_subnets.1, module.vpc.database_subnets.2]
+    security_group_ids = [module.security_group.security_group_id]
+  }
 }
 
 resource "aws_s3_bucket_notification" "lambda_trigger" {
