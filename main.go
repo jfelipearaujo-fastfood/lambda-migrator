@@ -12,6 +12,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -24,6 +25,20 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 	}
 	s3Client := s3.NewFromConfig(sdkConfig)
 
+	// ------------------------------
+	slog.Info("listing buckets")
+
+	res, err := s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	if err != nil {
+		slog.ErrorContext(ctx, "error while trying to list buckets", "error", err)
+		return err
+	}
+
+	for _, b := range res.Buckets {
+		slog.InfoContext(ctx, "found a bucket", "name", *b.Name)
+	}
+	// ------------------------------
+
 	slog.InfoContext(ctx, "processing request", "num_of_records", len(s3Event.Records))
 
 	for _, record := range s3Event.Records {
@@ -34,10 +49,12 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 
 		slog.Info("getting the object")
 
-		raw, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
-			Bucket: &bucket,
-			Key:    &key,
-		})
+		params := &s3.GetObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(key),
+		}
+
+		raw, err := s3Client.GetObject(ctx, params)
 		if err != nil {
 			slog.ErrorContext(ctx, "error while trying to get the object", "bucket", bucket, "key", key, "error", err)
 			return err

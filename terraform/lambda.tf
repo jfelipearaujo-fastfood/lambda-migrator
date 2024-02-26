@@ -68,37 +68,16 @@ resource "aws_iam_policy" "lambda_policy_s3" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Action   = "s3:GetObject",
-      Effect   = "Allow",
-      Resource = data.aws_s3_bucket.bucket.arn
-      }, {
-      Action   = "s3:DeleteObject",
+      Action = [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ],
       Effect   = "Allow",
       Resource = data.aws_s3_bucket.bucket.arn
     }]
   })
 }
-
-# resource "aws_iam_policy" "lambda_ec2_vpc" {
-#   name = "policy-ec2-vpc-${var.lambda_name}"
-
-#   policy = jsonencode({
-#     "Version" : "2012-10-17",
-#     "Statement" : [
-#       {
-#         "Effect" : "Allow",
-#         "Action" : [
-#           "ec2:DescribeNetworkInterfaces",
-#           "ec2:CreateNetworkInterface",
-#           "ec2:DeleteNetworkInterface",
-#           "ec2:DescribeInstances",
-#           "ec2:AttachNetworkInterface"
-#         ],
-#         "Resource" : "*"
-#       }
-#     ]
-#   })
-# }
 
 resource "aws_iam_policy_attachment" "lambda_policy_attachment" {
   name       = "policy-attachment-${var.lambda_name}"
@@ -117,9 +96,3 @@ resource "aws_iam_policy_attachment" "lambda_policy_attachment_s3" {
   roles      = [aws_iam_role.lambda_role.name]
   policy_arn = aws_iam_policy.lambda_policy_s3.arn
 }
-
-# resource "aws_iam_policy_attachment" "lambda_policy_attachment_ec2_vpc" {
-#   name       = "policy-attachment-ec2_vpc-${var.lambda_name}"
-#   roles      = [aws_iam_role.lambda_role.name]
-#   policy_arn = aws_iam_policy.lambda_ec2_vpc.arn
-# }
