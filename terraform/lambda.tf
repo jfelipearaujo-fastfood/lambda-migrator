@@ -26,6 +26,15 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = filebase64sha256("./lambda.zip")
 }
 
+resource "aws_s3_bucket_notification" "lambda_trigger" {
+  bucket = data.aws_s3_bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.lambda_function.arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "role-${var.lambda_name}"
 
