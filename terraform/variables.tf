@@ -20,7 +20,12 @@ variable "project_name" {
 }
 
 variable "database_name" {
-  description = "The name of the project"
+  description = "The name of the database"
+  default     = "fastfood"
+}
+
+variable "database_username" {
+  description = "The username of the database"
   default     = "fastfood"
 }
 

@@ -1,7 +1,3 @@
-data "aws_s3_bucket" "bucket" {
-  bucket = var.bucket_name
-}
-
 resource "aws_lambda_function" "lambda_function" {
   function_name = var.lambda_name
 
@@ -17,8 +13,8 @@ resource "aws_lambda_function" "lambda_function" {
     variables = {
       DB_HOST     = module.rds_proxy.proxy_endpoint
       DB_PORT     = var.database_port
-      DB_NAME     = "db-${var.database_name}"
-      DB_USERNAME = local.db_username
+      DB_NAME     = var.database_name
+      DB_USERNAME = var.database_username
       DB_PASSWORD = jsondecode(aws_secretsmanager_secret_version.superuser.secret_string)["password"]
     }
   }
@@ -26,9 +22,9 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = filebase64sha256("./lambda.zip")
 
   vpc_config {
-    ipv6_allowed_for_dual_stack = "false"
-    security_group_ids          = [module.rds_sg.security_group_id]
-    subnet_ids                  = [module.vpc.database_subnets[0], module.vpc.database_subnets[1], module.vpc.database_subnets[2]]
+    ipv6_allowed_for_dual_stack = false
+    subnet_ids                  = [module.vpc.private_subnets.0, module.vpc.private_subnets.1, module.vpc.private_subnets.2]
+    security_group_ids          = [module.vpc.default_security_group_id]
   }
 }
 
@@ -38,6 +34,8 @@ resource "aws_s3_bucket_notification" "lambda_trigger" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.lambda_function.arn
     events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "migrations/"
+    filter_suffix       = ".sql"
   }
 }
 
@@ -81,10 +79,37 @@ resource "aws_iam_policy" "lambda_policy_s3" {
   })
 }
 
+# resource "aws_iam_policy" "lambda_ec2_vpc" {
+#   name = "policy-ec2-vpc-${var.lambda_name}"
+
+#   policy = jsonencode({
+#     "Version" : "2012-10-17",
+#     "Statement" : [
+#       {
+#         "Effect" : "Allow",
+#         "Action" : [
+#           "ec2:DescribeNetworkInterfaces",
+#           "ec2:CreateNetworkInterface",
+#           "ec2:DeleteNetworkInterface",
+#           "ec2:DescribeInstances",
+#           "ec2:AttachNetworkInterface"
+#         ],
+#         "Resource" : "*"
+#       }
+#     ]
+#   })
+# }
+
 resource "aws_iam_policy_attachment" "lambda_policy_attachment" {
   name       = "policy-attachment-${var.lambda_name}"
   roles      = [aws_iam_role.lambda_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_policy_attachment" "iam_role_policy_attachment_vpc" {
+  name       = "policy-attachment-vpc-${var.lambda_name}"
+  roles      = [aws_iam_role.lambda_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_policy_attachment" "lambda_policy_attachment_s3" {
@@ -92,3 +117,9 @@ resource "aws_iam_policy_attachment" "lambda_policy_attachment_s3" {
   roles      = [aws_iam_role.lambda_role.name]
   policy_arn = aws_iam_policy.lambda_policy_s3.arn
 }
+
+# resource "aws_iam_policy_attachment" "lambda_policy_attachment_ec2_vpc" {
+#   name       = "policy-attachment-ec2_vpc-${var.lambda_name}"
+#   roles      = [aws_iam_role.lambda_role.name]
+#   policy_arn = aws_iam_policy.lambda_ec2_vpc.arn
+# }

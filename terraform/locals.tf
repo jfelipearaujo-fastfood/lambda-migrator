@@ -1,6 +1,13 @@
-resource "random_pet" "users" {
-  length    = 2
-  separator = "_"
+data "aws_caller_identity" "current" {}
+
+data "aws_availability_zones" "available" {}
+
+data "aws_s3_bucket" "bucket" {
+  bucket = var.bucket_name
+}
+
+data "aws_kms_alias" "secretsmanager" {
+  name = "alias/aws/secretsmanager"
 }
 
 resource "random_password" "password" {
@@ -11,8 +18,6 @@ resource "random_password" "password" {
 locals {
   name = var.project_name
 
-  # using random here due to secrets taking at least 7 days before fully deleting from account
-  db_username = random_pet.users.id
   db_password = random_password.password.result
 
   vpc_cidr = "10.0.0.0/16"
