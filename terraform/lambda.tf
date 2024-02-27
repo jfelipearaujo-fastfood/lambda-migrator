@@ -24,28 +24,9 @@ resource "aws_lambda_function" "lambda_function" {
 
   vpc_config {
     ipv6_allowed_for_dual_stack = false
-    subnet_ids                  = module.vpc.intra_subnets
-    security_group_ids          = [module.security_group_lambda.security_group_id]
+    subnet_ids                  = module.vpc.private_subnets
+    security_group_ids          = [aws_security_group.security_group.id]
   }
-}
-
-resource "aws_s3_bucket_notification" "lambda_trigger" {
-  bucket = data.aws_s3_bucket.bucket.id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.lambda_function.arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "migrations/"
-    filter_suffix       = ".sql"
-  }
-}
-
-resource "aws_lambda_permission" "lambda_permission" {
-  statement_id  = "AllowS3Invoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = data.aws_s3_bucket.bucket.arn
 }
 
 resource "aws_iam_role" "lambda_role" {
@@ -63,25 +44,6 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-resource "aws_iam_policy" "lambda_policy_s3" {
-  name = "policy-s3-${var.lambda_name}"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Action = [
-        "s3:GetObject",
-        "s3:DeleteObject"
-      ],
-      Effect = "Allow",
-      Resource = [
-        data.aws_s3_bucket.bucket.arn,
-        "${data.aws_s3_bucket.bucket.arn}/*"
-      ]
-    }]
-  })
-}
-
 resource "aws_iam_policy_attachment" "lambda_policy_attachment" {
   name       = "policy-attachment-${var.lambda_name}"
   roles      = [aws_iam_role.lambda_role.name]
@@ -92,10 +54,4 @@ resource "aws_iam_policy_attachment" "iam_role_policy_attachment_vpc" {
   name       = "policy-attachment-vpc-${var.lambda_name}"
   roles      = [aws_iam_role.lambda_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_policy_attachment" "lambda_policy_attachment_s3" {
-  name       = "policy-attachment-s3-${var.lambda_name}"
-  roles      = [aws_iam_role.lambda_role.name]
-  policy_arn = aws_iam_policy.lambda_policy_s3.arn
 }

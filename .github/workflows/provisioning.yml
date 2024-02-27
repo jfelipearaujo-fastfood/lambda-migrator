@@ -103,7 +103,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: terraform apply -input=false -auto-approve -var="bucket_name=${{ secrets.AWS_BUCKET_TF_STATE }}"
 
-  upload:
+  run:
     needs:
       - deploy
     runs-on: ubuntu-latest
@@ -117,5 +117,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Upload script files
-        run: aws s3 cp scripts/ s3://${{ secrets.AWS_BUCKET_TF_STATE }}/migrations --recursive
+      - name: Run script files
+        run: aws lambda invoke --function-name lambda_migrator out --log-type Tail > log.json
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: log
+          path: log.json
+          retention-days: 1
