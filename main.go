@@ -36,6 +36,11 @@ func handler(ctx context.Context) error {
 	}
 	defer conn.Close()
 
+	if err := conn.Ping(); err != nil {
+		slog.Error("error while trying to ping the database", "error", err)
+		return err
+	}
+
 	// execute the sql
 	slog.Info("executing the query")
 
