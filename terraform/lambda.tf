@@ -22,11 +22,11 @@ resource "aws_lambda_function" "lambda_function" {
 
   source_code_hash = filebase64sha256("./lambda.zip")
 
-  # vpc_config {
-  #   ipv6_allowed_for_dual_stack = false
-  #   subnet_ids                  = [module.vpc.private_subnets.0, module.vpc.private_subnets.1, module.vpc.private_subnets.2]
-  #   security_group_ids          = [module.vpc.default_security_group_id]
-  # }
+  vpc_config {
+    ipv6_allowed_for_dual_stack = false
+    subnet_ids                  = [module.vpc.private_subnets.0, module.vpc.private_subnets.1, module.vpc.private_subnets.2]
+    security_group_ids          = [module.vpc.default_security_group_id]
+  }
 }
 
 resource "aws_s3_bucket_notification" "lambda_trigger" {
