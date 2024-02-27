@@ -1,10 +1,16 @@
 build:
 	@echo "Building..."
-	@env GOOS=linux GOARCH=arm64 go build -o terraform/bootstrap main.go
+	@env CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o terraform/bootstrap main.go
 
 zip:
 	@echo "Zipping..."
 	@zip terraform/lambda.zip terraform/bootstrap
+
+upload:
+	@echo "Creating folder..."
+	@aws s3api put-object --bucket jsfelipearaujo --key "migrations/" > /dev/null
+	@echo "Uploading..."
+	@aws s3 cp scripts/ s3://jsfelipearaujo/migrations --recursive
 
 init:
 	@echo "Initializing..."

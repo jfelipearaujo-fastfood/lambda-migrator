@@ -9,16 +9,16 @@ resource "aws_lambda_function" "lambda_function" {
   memory_size   = 128
   timeout       = 30
 
-  environment {
-    variables = {
-      # DB_HOST     = module.rds_proxy.proxy_endpoint
-      DB_HOST     = module.db.db_instance_endpoint
-      DB_PORT     = var.database_port
-      DB_NAME     = var.database_name
-      DB_USERNAME = local.db_username
-      DB_PASSWORD = jsondecode(aws_secretsmanager_secret_version.superuser.secret_string)["password"]
-    }
-  }
+  # environment {
+  #   variables = {
+  #     # DB_HOST     = module.rds_proxy.proxy_endpoint
+  #     DB_HOST     = module.db.db_instance_endpoint
+  #     DB_PORT     = var.database_port
+  #     DB_NAME     = var.database_name
+  #     DB_USERNAME = local.db_username
+  #     DB_PASSWORD = jsondecode(aws_secretsmanager_secret_version.superuser.secret_string)["password"]
+  #   }
+  # }
 
   source_code_hash = filebase64sha256("./lambda.zip")
 
