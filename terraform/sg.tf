@@ -13,6 +13,25 @@ resource "aws_security_group" "security_group" {
   }
 
   egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group" "security_group_lambda" {
+  name_prefix = "lambda-sg-"
+  description = "Default security group for ${var.project_name} Lambda."
+  vpc_id      = module.vpc.vpc_id
+
+  egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
