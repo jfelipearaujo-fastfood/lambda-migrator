@@ -1,10 +1,10 @@
 build:
 	@echo "Building..."
-	@env CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o terraform/bootstrap main.go
+	@env GOOS=linux GOARCH=arm64 go build -o bootstrap main.go
 
 zip:
 	@echo "Zipping..."
-	@zip terraform/lambda.zip terraform/bootstrap
+	@zip lambda.zip bootstrap
 
 upload:
 	@echo "Creating folder..."
