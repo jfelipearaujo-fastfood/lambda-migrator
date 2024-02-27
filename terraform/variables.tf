@@ -24,11 +24,6 @@ variable "database_name" {
   default     = "fastfood"
 }
 
-variable "database_username" {
-  description = "The username of the database"
-  default     = "fastfood"
-}
-
 variable "database_port" {
   description = "The port the database will listen on"
   default     = 5432

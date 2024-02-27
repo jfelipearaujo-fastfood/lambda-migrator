@@ -42,3 +42,6 @@ plan
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Ignore Python virtual environment
+.venv

@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 data "aws_availability_zones" "available" {}
 
 data "aws_s3_bucket" "bucket" {
@@ -8,12 +6,6 @@ data "aws_s3_bucket" "bucket" {
 
 data "aws_kms_alias" "secretsmanager" {
   name = "alias/aws/secretsmanager"
-}
-
-data "aws_region" "current" {}
-
-data "aws_ec2_managed_prefix_list" "this" {
-  name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 
 resource "random_pet" "users" {

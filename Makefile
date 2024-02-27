@@ -47,10 +47,6 @@ destroy:
 	@cd terraform \
 		&& terraform destroy -auto-approve
 
-former:
-	@echo "Initializing Terraform..."
-	@cd terraformer \
-		&& terraform init
-	@echo "Running Terraformer..."
-	@cd terraformer \
-		&& terraformer import aws -o terraformer --regions=us-east-1 --resources=lambda
+gen-cloud-diagrams:
+	cd docs && \
+	python3 cloud_aws_database_migrations.py
