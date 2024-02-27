@@ -20,26 +20,12 @@ import (
 func handler(ctx context.Context, s3Event events.S3Event) error {
 	sdkConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to load default config", "error", err)
+		slog.Error("failed to load default config", "error", err)
 		return err
 	}
 	s3Client := s3.NewFromConfig(sdkConfig)
 
-	// ------------------------------
-	slog.Info("listing buckets")
-
-	res, err := s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
-	if err != nil {
-		slog.ErrorContext(ctx, "error while trying to list buckets", "error", err)
-		return err
-	}
-
-	for _, b := range res.Buckets {
-		slog.InfoContext(ctx, "found a bucket", "name", *b.Name)
-	}
-	// ------------------------------
-
-	slog.InfoContext(ctx, "processing request", "num_of_records", len(s3Event.Records))
+	slog.Info("processing request", "num_of_records", len(s3Event.Records))
 
 	for _, record := range s3Event.Records {
 		bucket := record.S3.Bucket.Name
@@ -56,7 +42,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 
 		raw, err := s3Client.GetObject(ctx, params)
 		if err != nil {
-			slog.ErrorContext(ctx, "error while trying to get the object", "bucket", bucket, "key", key, "error", err)
+			slog.Error("error while trying to get the object", "bucket", bucket, "key", key, "error", err)
 			return err
 		}
 
@@ -65,7 +51,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		buf := new(bytes.Buffer)
 		_, err = buf.ReadFrom(raw.Body)
 		if err != nil {
-			slog.ErrorContext(ctx, "error while trying to read the object", "bucket", bucket, "key", key, "error", err)
+			slog.Error("error while trying to read the object", "bucket", bucket, "key", key, "error", err)
 			return err
 		}
 
@@ -85,7 +71,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 
 		conn, err := sql.Open("postgres", connectionStr)
 		if err != nil {
-			slog.ErrorContext(ctx, "error while trying to connect to the database", "error", err)
+			slog.Error("error while trying to connect to the database", "error", err)
 			return err
 		}
 		defer conn.Close()
@@ -95,7 +81,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 
 		_, err = conn.Exec(data)
 		if err != nil {
-			slog.ErrorContext(ctx, "error while trying to execute the query", "error", err)
+			slog.Error("error while trying to execute the query", "error", err)
 		}
 
 		slog.Info("deleting the object")
@@ -106,7 +92,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			Key:    &key,
 		})
 		if err != nil {
-			slog.ErrorContext(ctx, "error while trying to delete the object", "bucket", bucket, "key", key, "error", err)
+			slog.Error("error while trying to delete the object", "bucket", bucket, "key", key, "error", err)
 			return err
 		}
 

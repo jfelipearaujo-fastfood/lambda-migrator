@@ -70,7 +70,6 @@ resource "aws_iam_policy" "lambda_policy_s3" {
     Version = "2012-10-17",
     Statement = [{
       Action = [
-        "s3:ListAllMyBuckets",
         "s3:GetObject",
         "s3:DeleteObject"
       ],
