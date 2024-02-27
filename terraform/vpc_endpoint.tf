@@ -4,6 +4,8 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
 
   route_table_ids = module.vpc.private_route_table_ids
 
+  private_dns_enabled = true
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
