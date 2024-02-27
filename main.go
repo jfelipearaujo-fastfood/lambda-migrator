@@ -23,7 +23,10 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		slog.Error("failed to load default config", "error", err)
 		return err
 	}
-	s3Client := s3.NewFromConfig(sdkConfig)
+	s3Client := s3.New(s3.Options{
+		Region:       sdkConfig.Region,
+		UsePathStyle: true,
+	})
 
 	slog.Info("processing request", "num_of_records", len(s3Event.Records))
 
