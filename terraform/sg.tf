@@ -12,23 +12,11 @@ resource "aws_security_group" "security_group" {
     ]
   }
 
-  dynamic "ingress" {
-    for_each = [1]
-    content {
-      self      = true
-      from_port = 0
-      to_port   = 65535
-      protocol  = "tcp"
-    }
-  }
-
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = [
-      "0.0.0.0/0"
-    ]
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    prefix_list_ids = [data.aws_prefix_list.private_s3.id]
   }
 
   lifecycle {
