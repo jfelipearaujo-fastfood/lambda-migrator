@@ -56,6 +56,23 @@ func handler(ctx context.Context) error {
 
 	slog.Info("completed", "affected_rows", affectedRows)
 
+	// listing the tables
+	rows, err := conn.Query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
+	if err != nil {
+		slog.Error("error while trying to list the tables", "error", err)
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var tableName string
+		if err := rows.Scan(&tableName); err != nil {
+			slog.Error("error while trying to scan the table name", "error", err)
+			return err
+		}
+		slog.Info("table", "name", tableName)
+	}
+
 	return nil
 }
 
