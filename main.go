@@ -26,7 +26,7 @@ func handler(ctx context.Context) error {
 	// connect to the database
 	connectionStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbName)
 
-	slog.Info("connecting to the database", "connection_string", connectionStr)
+	slog.Info("connecting to the database")
 
 	conn, err := sql.Open("postgres", connectionStr)
 	if err != nil {
