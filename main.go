@@ -26,7 +26,7 @@ func handler(ctx context.Context) error {
 	// connect to the database
 	connectionStr := fmt.Sprintf("postgres://%s:%s@%s/%s", dbUser, dbPass, dbHost, dbName)
 
-	slog.Info("connecting to the database", "connectionStr", connectionStr)
+	slog.Info("connecting to the database", "connection_string", connectionStr)
 
 	conn, err := sql.Open("postgres", connectionStr)
 	if err != nil {
@@ -43,12 +43,18 @@ func handler(ctx context.Context) error {
 	// execute the sql
 	slog.Info("executing the query")
 
-	_, err = conn.Exec(query)
+	res, err := conn.Exec(query)
 	if err != nil {
 		slog.Error("error while trying to execute the query", "error", err)
 	}
 
-	slog.Info("completed")
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		slog.Error("error while trying to get the affected rows", "error", err)
+		return err
+	}
+
+	slog.Info("completed", "affected_rows", affectedRows)
 
 	return nil
 }
