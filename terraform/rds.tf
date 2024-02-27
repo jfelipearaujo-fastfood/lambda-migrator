@@ -17,7 +17,7 @@ module "db" {
 
   db_name           = var.database_name
   username          = local.db_username
-  password          = local.db_password
+  password          = jsondecode(aws_secretsmanager_secret_version.superuser.secret_string)["password"]
   port              = var.database_port
   apply_immediately = true
 
