@@ -10,6 +10,12 @@ data "aws_kms_alias" "secretsmanager" {
   name = "alias/aws/secretsmanager"
 }
 
+data "aws_region" "current" {}
+
+data "aws_ec2_managed_prefix_list" "this" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
 resource "random_pet" "users" {
   length    = 2
   separator = "_"

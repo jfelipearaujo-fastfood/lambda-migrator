@@ -24,11 +24,10 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		return err
 	}
 	s3Client := s3.New(s3.Options{
-		Region:       sdkConfig.Region,
-		UsePathStyle: true,
+		Region: sdkConfig.Region,
 	})
 
-	slog.Info("processing request", "num_of_records", len(s3Event.Records))
+	slog.Info("processing request", "region", sdkConfig.Region, "num_of_records", len(s3Event.Records))
 
 	for _, record := range s3Event.Records {
 		bucket := record.S3.Bucket.Name

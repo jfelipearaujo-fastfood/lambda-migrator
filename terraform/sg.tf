@@ -26,71 +26,21 @@ resource "aws_security_group" "security_group" {
   }
 }
 
-resource "aws_security_group" "security_group_lambda" {
-  name_prefix = "lambda-sg-"
-  description = "Default security group for ${var.project_name} Lambda."
-  vpc_id      = module.vpc.vpc_id
+module "security_group_lambda" {
+  name = var.lambda_name
 
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    prefix_list_ids = [data.aws_prefix_list.private_s3.id]
-  }
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 4.0"
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  description = "Security Group for Lambda Egress"
+
+  vpc_id = module.vpc.vpc_id
+
+  egress_cidr_blocks      = []
+  egress_ipv6_cidr_blocks = []
+
+  # Prefix list ids to use in all egress rules in this module
+  egress_prefix_list_ids = [module.vpc_endpoints.endpoints["s3"]["prefix_list_id"]]
+
+  egress_rules = ["https-443-tcp"]
 }
-
-# module "security_group" {
-#   source  = "terraform-aws-modules/security-group/aws"
-#   version = "~> 5.0"
-
-#   name        = local.name
-#   description = "PostgreSQL security group"
-#   vpc_id      = module.vpc.vpc_id
-
-#   # ingress
-#   ingress_with_cidr_blocks = [
-#     {
-#       from_port   = 5432
-#       to_port     = 5432
-#       protocol    = "tcp"
-#       description = "PostgreSQL access from within VPC"
-#       cidr_blocks = module.vpc.vpc_cidr_block
-#     }
-#     # ,{
-#     #   description = "Private subnet PostgreSQL access"
-#     #   rule        = "postgresql-tcp"
-#     #   cidr_blocks = join(",", module.vpc.private_subnets_cidr_blocks)
-#     # }
-#   ]
-# }
-
-# module "rds_proxy_security_group" {
-#   source  = "terraform-aws-modules/security-group/aws"
-#   version = "~> 5.0"
-
-#   name        = "rds_proxy"
-#   description = "PostgreSQL RDS Proxy security group"
-#   vpc_id      = module.vpc.vpc_id
-
-#   revoke_rules_on_delete = true
-
-#   ingress_with_cidr_blocks = [
-#     {
-#       description = "Private subnet PostgreSQL access"
-#       rule        = "postgresql-tcp"
-#       cidr_blocks = join(",", module.vpc.private_subnets_cidr_blocks)
-#     }
-#   ]
-
-#   egress_with_cidr_blocks = [
-#     {
-#       description = "Database subnet PostgreSQL access"
-#       rule        = "postgresql-tcp"
-#       cidr_blocks = join(",", module.vpc.database_subnets_cidr_blocks)
-#     },
-#   ]
-# }
