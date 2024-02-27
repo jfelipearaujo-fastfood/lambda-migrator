@@ -64,14 +64,18 @@ func handler(ctx context.Context) error {
 	}
 	defer rows.Close()
 
+	tableNames := make([]string, 0)
+
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
 			slog.Error("error while trying to scan the table name", "error", err)
 			return err
 		}
-		slog.Info("table", "name", tableName)
+		tableNames = append(tableNames, tableName)
 	}
+
+	slog.Info("tables", "tables", tableNames)
 
 	return nil
 }
