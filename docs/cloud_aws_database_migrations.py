@@ -6,7 +6,7 @@ from diagrams.aws.compute import LambdaFunction as Lambda
 diagram_attr = {
     "fontsize": "25",
     "bgcolor": "white",
-    "pad": "0.5",
+    "pad": "0.2",
     "splines": "spline",
 }
 
@@ -23,10 +23,7 @@ item_attr = {
 }
 
 diagram_label = """
-
-Cloud AWS Database Migrations
-
-"""
+Cloud AWS Database Migrations"""
 
 with Diagram(diagram_label, show=False, graph_attr=diagram_attr, direction="LR"):
     github = GithubActions("Github Actions", **item_attr)

@@ -50,3 +50,7 @@ destroy:
 gen-cloud-diagrams:
 	cd docs && \
 	python3 cloud_aws_database_migrations.py
+
+gen-tf-docs:
+	@echo "Generating Terraform Docs..."
+	@terraform-docs markdown table terraform

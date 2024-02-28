@@ -12,6 +12,7 @@ variable "tags" {
 }
 
 variable "bucket_name" {
+  description = "The name of the S3 bucket to store the tfstate file"
 }
 
 variable "project_name" {
