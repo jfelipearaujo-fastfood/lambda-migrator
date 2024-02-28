@@ -39,8 +39,8 @@ Bellow it is described all the resources used to create the architecture propose
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_db"></a> [db](#module\_db) | terraform-aws-modules/rds/aws | ~> 5.0 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 5.0 |
+| <a name="module_db"></a> [db](#module\_db) | terraform-aws-modules/rds/aws | 5.9.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.5.2 |
 ## Resources
 
 | Name | Type |
