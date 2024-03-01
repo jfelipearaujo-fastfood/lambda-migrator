@@ -1,6 +1,6 @@
 resource "aws_secretsmanager_secret" "superuser" {
   name        = local.db_username
-  description = "Database superuser, ${local.db_username}, database connection values"
+  description = "Database superuser credentials"
   kms_key_id  = data.aws_kms_alias.secretsmanager.id
 }
 

@@ -1,15 +1,26 @@
-variable "tags" {
-  type        = map(string)
-  description = "The default tags to use for AWS resources"
-  default = {
-    App = "database"
-  }
-}
-
 variable "region" {
   type        = string
   description = "The default region to use for AWS"
-  default     = "us-east-1"
+}
+
+variable "db_name" {
+  type        = string
+  description = "The name of the database"
+}
+
+variable "db_port" {
+  type        = number
+  description = "The port the database will listen on"
+}
+
+variable "db_username" {
+  type        = string
+  description = "The username for the database"
+}
+
+variable "db_password" {
+  type        = string
+  description = "The password for the database"
 }
 
 variable "vpc_id" {

@@ -48,7 +48,7 @@ destroy:
 		&& terraform destroy -auto-approve
 
 gen-cloud-diagrams:
-	cd docs && \
+	cd docs/diagrams && \
 	python3 cloud_aws_database_migrations.py
 
 gen-tf-docs:

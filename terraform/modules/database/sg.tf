@@ -1,14 +1,13 @@
 resource "aws_security_group" "security_group" {
   name_prefix = "db-sg-"
-  description = "Default security group for ${var.project_name} PostgreSQL database allowing access from private network."
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc_id
 
   ingress {
-    from_port = var.database_port
-    to_port   = var.database_port
+    from_port = var.db_port
+    to_port   = var.db_port
     protocol  = "tcp"
     cidr_blocks = [
-      module.vpc.vpc_cidr_block
+      var.vpc_cidr_block
     ]
   }
 

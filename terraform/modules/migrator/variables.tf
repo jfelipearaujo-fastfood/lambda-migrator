@@ -1,0 +1,45 @@
+variable "lambda_name" {
+  type        = string
+  description = "The name of the lambda function"
+}
+
+variable "db_host" {
+  type        = string
+  description = "The hostname of the database"
+}
+
+variable "db_name" {
+  type        = string
+  description = "The name of the database"
+  default     = "fastfood"
+}
+
+variable "db_username" {
+  type        = string
+  description = "The username for the database"
+}
+
+variable "db_password" {
+  type        = string
+  description = "The password for the database"
+}
+
+variable "security_group_id" {
+  type        = string
+  description = "The ID of the security group"
+}
+
+variable "private_subnet_1a" {
+  type        = string
+  description = "The ID of the private subnet in the first availability zone"
+}
+
+variable "private_subnet_1b" {
+  type        = string
+  description = "The ID of the private subnet in the second availability zone"
+}
+
+variable "private_subnet_1c" {
+  type        = string
+  description = "The ID of the private subnet in the third availability zone"
+}
