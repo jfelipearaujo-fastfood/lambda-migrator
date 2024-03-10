@@ -3,6 +3,21 @@ variable "region" {
   description = "The default region to use for AWS"
 }
 
+variable "db_instance_class" {
+  type        = string
+  description = "The instance class to use for the database"
+}
+
+variable "db_engine" {
+  type        = string
+  description = "The database engine to use"
+}
+
+variable "db_engine_version" {
+  type        = string
+  description = "The version of the database engine to use"
+}
+
 variable "db_name" {
   type        = string
   description = "The name of the database"
@@ -33,17 +48,7 @@ variable "vpc_cidr_block" {
   description = "The CIDR block of the VPC"
 }
 
-variable "private_subnet_1a" {
-  type        = string
-  description = "The ID of the private subnet in the first availability zone"
-}
-
-variable "private_subnet_1b" {
-  type        = string
-  description = "The ID of the private subnet in the second availability zone"
-}
-
-variable "private_subnet_1c" {
-  type        = string
-  description = "The ID of the private subnet in the third availability zone"
+variable "private_subnets" {
+  type        = list(string)
+  description = "The IDs of the private subnets"
 }

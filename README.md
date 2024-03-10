@@ -25,9 +25,7 @@ No providers.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_private_subnet_1a"></a> [private\_subnet\_1a](#input\_private\_subnet\_1a) | The ID of the private subnet in the first availability zone | `string` | n/a | yes |
-| <a name="input_private_subnet_1b"></a> [private\_subnet\_1b](#input\_private\_subnet\_1b) | The ID of the private subnet in the second availability zone | `string` | n/a | yes |
-| <a name="input_private_subnet_1c"></a> [private\_subnet\_1c](#input\_private\_subnet\_1c) | The ID of the private subnet in the third availability zone | `string` | n/a | yes |
+| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | The IDs of the private subnets | `list(string)` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | The default region to use for AWS | `string` | `"us-east-1"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | The default tags to use for AWS resources | `map(string)` | <pre>{<br>  "App": "database"<br>}</pre> | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | The CIDR block of the VPC | `string` | n/a | yes |
@@ -38,7 +36,6 @@ No providers.
 |------|--------|---------|
 | <a name="module_database"></a> [database](#module\_database) | ./modules/database | n/a |
 | <a name="module_migrator"></a> [migrator](#module\_migrator) | ./modules/migrator | n/a |
-| <a name="module_secret"></a> [secret](#module\_secret) | ./modules/secret | n/a |
 ## Resources
 
 No resources.
@@ -51,4 +48,3 @@ No outputs.
 
 - [database](./docs/database.md)
 - [migrator](./docs/migrator.md)
-- [secret](./docs/secret.md)

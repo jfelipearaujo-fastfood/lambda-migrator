@@ -29,17 +29,7 @@ variable "security_group_id" {
   description = "The ID of the security group"
 }
 
-variable "private_subnet_1a" {
-  type        = string
-  description = "The ID of the private subnet in the first availability zone"
-}
-
-variable "private_subnet_1b" {
-  type        = string
-  description = "The ID of the private subnet in the second availability zone"
-}
-
-variable "private_subnet_1c" {
-  type        = string
-  description = "The ID of the private subnet in the third availability zone"
+variable "private_subnets" {
+  type        = list(string)
+  description = "The IDs of the private subnets"
 }

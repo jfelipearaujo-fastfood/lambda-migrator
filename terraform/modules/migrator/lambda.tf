@@ -23,7 +23,7 @@ resource "aws_lambda_function" "lambda_function" {
 
   vpc_config {
     ipv6_allowed_for_dual_stack = false
-    subnet_ids                  = [var.private_subnet_1a, var.private_subnet_1b, var.private_subnet_1c]
+    subnet_ids                  = var.private_subnets
     security_group_ids          = [var.security_group_id]
   }
 }

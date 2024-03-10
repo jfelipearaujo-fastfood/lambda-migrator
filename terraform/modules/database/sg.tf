@@ -1,6 +1,6 @@
-resource "aws_security_group" "security_group" {
-  name_prefix = "db-sg-"
-  vpc_id      = var.vpc_id
+resource "aws_security_group" "db_security_group" {
+  name   = "db-sg-${var.db_name}"
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = var.db_port

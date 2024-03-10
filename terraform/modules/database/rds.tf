@@ -1,41 +1,28 @@
-module "db" {
-  source  = "terraform-aws-modules/rds/aws"
-  version = "5.9.0"
-
+resource "aws_db_instance" "db" {
   identifier = var.db_name
 
-  engine               = "postgres"
-  engine_version       = "14"
-  family               = "postgres14"
-  major_engine_version = "14"
-  instance_class       = "db.t3.micro"
+  instance_class              = var.db_instance_class
+  engine                      = var.db_engine
+  engine_version              = var.db_engine_version
+  db_name                     = var.db_name
+  port                        = var.db_port
+  username                    = var.db_username
+  manage_master_user_password = true
 
-  allocated_storage     = 20
-  max_allocated_storage = 30
+  vpc_security_group_ids = [aws_security_group.db_security_group.id]
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
+  parameter_group_name   = aws_db_parameter_group.db_parameter_group.name
 
-  iam_database_authentication_enabled = false
+  skip_final_snapshot = true
+  publicly_accessible = false
 
-  db_name  = var.db_name
-  username = var.db_username
-  password = var.db_password
-  # username = local.db_username
-  # password          = jsondecode(aws_secretsmanager_secret_version.superuser.secret_string)["password"]
-  port              = var.db_port
-  apply_immediately = true
+  deletion_protection = false
+}
 
-  multi_az = false
+data "aws_secretsmanager_secret" "db" {
+  arn = aws_db_instance.db.master_user_secret[0].secret_arn
 
-  create_db_subnet_group = false
-  subnet_ids = [
-    var.private_subnet_1a,
-    var.private_subnet_1b,
-    var.private_subnet_1c
+  depends_on = [
+    aws_db_instance.db
   ]
-
-  vpc_security_group_ids = [
-    aws_security_group.security_group.id
-  ]
-
-  backup_retention_period = 0
-  deletion_protection     = false
 }
