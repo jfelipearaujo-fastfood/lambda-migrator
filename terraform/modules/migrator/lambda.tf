@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "lambda_function" {
-  function_name = "${var.lambda_name}-lf"
+  function_name = "lambda_${var.lambda_name}"
 
   filename      = "./lambda.zip"
   role          = aws_iam_role.lambda_role.arn
