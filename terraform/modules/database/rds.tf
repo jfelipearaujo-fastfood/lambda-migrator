@@ -26,3 +26,7 @@ data "aws_secretsmanager_secret" "db" {
     aws_db_instance.db
   ]
 }
+
+data "aws_secretsmanager_secret_version" "db" {
+  secret_id = data.aws_secretsmanager_secret.db.id
+}

@@ -5,7 +5,7 @@ output "db_host" {
 
 output "db_name" {
   description = "The name of the database"
-  value       = aws_db_instance.db.name
+  value       = aws_db_instance.db.db_name
 }
 
 output "db_username" {
@@ -16,10 +16,10 @@ output "db_username" {
 output "db_pass" {
   description = "The password for the database"
   sensitive   = true
-  value       = data.aws_secretsmanager_secret.db.secret_string
+  value       = jsondecode(data.aws_secretsmanager_secret_version.db.secret_string)["password"]
 }
 
 output "security_group_id" {
   description = "The ID of the security group"
-  value       = module.db.security_group_id
+  value       = aws_security_group.db_security_group.id
 }

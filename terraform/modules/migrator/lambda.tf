@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "lambda_function" {
   function_name = "${var.lambda_name}-lf"
 
-  filename      = "../../lambda.zip"
+  filename      = "./lambda.zip"
   role          = aws_iam_role.lambda_role.arn
   handler       = "bootstrap"
   runtime       = "provided.al2023"
@@ -19,7 +19,7 @@ resource "aws_lambda_function" "lambda_function" {
     }
   }
 
-  source_code_hash = filebase64sha256("../../lambda.zip")
+  source_code_hash = filebase64sha256("./lambda.zip")
 
   vpc_config {
     ipv6_allowed_for_dual_stack = false

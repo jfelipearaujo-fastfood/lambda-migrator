@@ -24,13 +24,13 @@ check:
 plan:
 	@echo "Planning..."
 	@cd terraform \
-		&& terraform plan -out=plan \
+		&& terraform plan -var-file="local.tfvars" -out=plan \
 		&& terraform show -json plan > plan.tfgraph
 
 fmt:
 	@echo "Formatting..."
 	@cd terraform \
-		&& terraform fmt -check
+		&& terraform fmt -check -recursive
 
 validate:
 	@echo "Validating..."

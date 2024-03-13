@@ -1,7 +1,3 @@
-# module "secret" {
-#   source = "./modules/secret"
-# }
-
 module "database" {
   source = "./modules/database"
 
@@ -12,8 +8,7 @@ module "database" {
   db_engine_version = "14.0"
   db_instance_class = "db.t3.micro"
   db_port           = 5432
-  db_username       = module.secret.db_username
-  db_password       = module.secret.db_password
+  db_username       = var.db_username
 
   vpc_id         = var.vpc_id
   vpc_cidr_block = var.vpc_cidr_block

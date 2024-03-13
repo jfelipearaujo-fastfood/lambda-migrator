@@ -33,11 +33,6 @@ variable "db_username" {
   description = "The username for the database"
 }
 
-variable "db_password" {
-  type        = string
-  description = "The password for the database"
-}
-
 variable "vpc_id" {
   type        = string
   description = "The ID of the VPC"

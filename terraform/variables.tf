@@ -26,3 +26,9 @@ variable "private_subnets" {
   type        = list(string)
   description = "The IDs of the private subnets"
 }
+
+variable "db_username" {
+  type        = string
+  description = "The username for the database"
+  default     = "fastfood"
+}
