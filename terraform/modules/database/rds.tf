@@ -2,6 +2,7 @@ resource "aws_db_instance" "db" {
   identifier = var.db_name
 
   instance_class              = var.db_instance_class
+  allocated_storage           = 10
   engine                      = var.db_engine
   engine_version              = var.db_engine_version
   db_name                     = var.db_name

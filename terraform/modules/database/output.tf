@@ -16,7 +16,7 @@ output "db_username" {
 output "db_pass" {
   description = "The password for the database"
   sensitive   = true
-  value       = jsondecode(data.aws_secretsmanager_secret_version.db.secret_string)["password"]
+  value       = jsondecode(data.aws_secretsmanager_secret_version.db.secret_string)
 }
 
 output "security_group_id" {
