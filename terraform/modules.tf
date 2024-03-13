@@ -5,7 +5,7 @@ module "database" {
 
   db_name           = "fastfood"
   db_engine         = "postgres"
-  db_engine_version = "14.0"
+  db_engine_version = "16"
   db_instance_class = "db.t3.micro"
   db_port           = 5432
   db_username       = var.db_username
