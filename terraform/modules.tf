@@ -22,6 +22,7 @@ module "migrator" {
   lambda_name = "migrator"
 
   db_host     = module.database.db_host
+  db_port     = module.database.db_port
   db_name     = module.database.db_name
   db_username = module.database.db_username
   db_password = module.database.db_pass

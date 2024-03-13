@@ -8,6 +8,11 @@ variable "db_host" {
   description = "The hostname of the database"
 }
 
+variable "db_port" {
+  type        = number
+  description = "The port of the database"
+}
+
 variable "db_name" {
   type        = string
   description = "The name of the database"

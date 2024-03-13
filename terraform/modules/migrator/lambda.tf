@@ -13,6 +13,7 @@ resource "aws_lambda_function" "lambda_function" {
     variables = {
       # DB_HOST     = module.rds_proxy.proxy_endpoint
       DB_HOST = var.db_host
+      DB_PORT = var.db_port
       DB_NAME = var.db_name
       DB_USER = var.db_username
       DB_PASS = var.db_password

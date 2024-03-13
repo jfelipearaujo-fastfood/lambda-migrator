@@ -3,6 +3,11 @@ output "db_host" {
   value       = aws_db_instance.db.address
 }
 
+output "db_port" {
+  description = "The port of the database"
+  value       = aws_db_instance.db.port
+}
+
 output "db_name" {
   description = "The name of the database"
   value       = aws_db_instance.db.db_name
