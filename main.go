@@ -24,7 +24,7 @@ func handler(ctx context.Context) error {
 	dbPass := os.Getenv("DB_PASS")
 
 	// connect to the database
-	connectionStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbName)
+	connectionStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, 5432, dbUser, dbPass, dbName)
 
 	slog.Info("connecting to the database")
 
