@@ -187,7 +187,7 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20231023004807_InitialCreateDb') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20231023004807_InitialCreateDb', '7.0.12');
+    VALUES ('20231023004807_InitialCreateDb', '7.0.14');
     END IF;
 END $EF$;
 COMMIT;
@@ -206,7 +206,7 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20240106005427_ChangedNullableDocumentId') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20240106005427_ChangedNullableDocumentId', '7.0.12');
+    VALUES ('20240106005427_ChangedNullableDocumentId', '7.0.14');
     END IF;
 END $EF$;
 COMMIT;
@@ -225,7 +225,7 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20240106005907_ChangedNullableEmail') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20240106005907_ChangedNullableEmail', '7.0.12');
+    VALUES ('20240106005907_ChangedNullableEmail', '7.0.14');
     END IF;
 END $EF$;
 COMMIT;
@@ -251,7 +251,27 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20240106005950_ChangedNullableName') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20240106005950_ChangedNullableName', '7.0.12');
+    VALUES ('20240106005950_ChangedNullableName', '7.0.14');
     END IF;
 END $EF$;
 COMMIT;
+
+START TRANSACTION;
+
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20240313232932_AddUserPassword') THEN
+    ALTER TABLE clients ADD "Password" text NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20240313232932_AddUserPassword') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20240313232932_AddUserPassword', '7.0.14');
+    END IF;
+END $EF$;
+COMMIT;
+
