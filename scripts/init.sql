@@ -275,3 +275,22 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20240315002832_ChangePasswordNullable') THEN
+    ALTER TABLE clients ALTER COLUMN "Password" DROP NOT NULL;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20240315002832_ChangePasswordNullable') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20240315002832_ChangePasswordNullable', '7.0.14');
+    END IF;
+END $EF$;
+COMMIT;
+
