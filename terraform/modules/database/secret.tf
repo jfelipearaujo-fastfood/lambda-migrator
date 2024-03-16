@@ -22,3 +22,21 @@ resource "aws_secretsmanager_secret_version" "master_user_secret_version" {
     aws_db_instance.db
   ]
 }
+
+resource "aws_iam_policy" "db_secret_policy" {
+  name = "db-secret-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = aws_secretsmanager_secret.master_user_secret.arn
+      },
+    ]
+  })
+}
