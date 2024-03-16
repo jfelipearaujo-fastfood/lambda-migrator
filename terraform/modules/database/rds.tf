@@ -9,7 +9,7 @@ resource "aws_db_instance" "db" {
   port              = var.db_port
 
   username = var.db_username
-  password = jsondecode(aws_secretsmanager_secret_version.master_user_secret_version)["password"]
+  password = random_password.password.result
 
   vpc_security_group_ids = [aws_security_group.db_security_group.id]
   db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name

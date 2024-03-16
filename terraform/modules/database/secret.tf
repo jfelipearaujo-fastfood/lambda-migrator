@@ -17,4 +17,8 @@ resource "aws_secretsmanager_secret_version" "master_user_secret_version" {
     username = var.db_username,
     password = random_password.password.result
   })
+
+  depends_on = [
+    aws_db_instance.db
+  ]
 }

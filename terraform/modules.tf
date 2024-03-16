@@ -28,4 +28,8 @@ module "migrator" {
 
   private_subnets   = var.private_subnets
   security_group_id = module.database.security_group_id
+
+  depends_on = [
+    module.database
+  ]
 }
