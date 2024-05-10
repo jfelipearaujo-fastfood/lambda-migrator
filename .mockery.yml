@@ -1,0 +1,16 @@
+with-expecter: false
+packages:
+    github.com/jfelipearaujo-org/lambda-migrator/internal/environment:
+        config:
+          filename: "{{ .InterfaceName | snakecase }}_mock.go"
+          dir: "./internal/environment/mocks"
+          mockname: "Mock{{.InterfaceName}}"
+          outpkg: "mocks"
+          include-regex: "(Environment)"
+    github.com/jfelipearaujo-org/lambda-migrator/internal/adapter/database:
+        config:
+          filename: "{{ .InterfaceName | snakecase }}_mock.go"
+          dir: "./internal/adapter/database/mocks"
+          mockname: "Mock{{.InterfaceName}}"
+          outpkg: "mocks"
+          include-regex: "(Service)"
