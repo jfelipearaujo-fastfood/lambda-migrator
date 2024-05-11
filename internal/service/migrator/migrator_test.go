@@ -9,6 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testQuery           = "SELECT 1"
+	testInfoTablesQuery = "SELECT (.+) FROM (.+)?information_schema.tables(.+)?"
+)
+
 func TestMigrator(t *testing.T) {
 	t.Run("Should migrate the database", func(t *testing.T) {
 		// Arrange
@@ -28,16 +33,16 @@ func TestMigrator(t *testing.T) {
 			Return("test").
 			Once()
 
-		mock.ExpectExec("SELECT 1").
+		mock.ExpectExec(testQuery).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		mock.ExpectQuery("SELECT (.+) FROM (.+)?information_schema.tables(.+)?").
+		mock.ExpectQuery(testInfoTablesQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"table_name"}).AddRow("orders"))
 
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx, "SELECT 1")
+		err = migrator.Migrate(ctx, testQuery)
 
 		// Assert
 		assert.NoError(t, err)
@@ -59,13 +64,13 @@ func TestMigrator(t *testing.T) {
 			Return(db).
 			Once()
 
-		mock.ExpectExec("SELECT 1").
+		mock.ExpectExec(testQuery).
 			WillReturnError(assert.AnError)
 
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx, "SELECT 1")
+		err = migrator.Migrate(ctx, testQuery)
 
 		// Assert
 		assert.Error(t, err)
@@ -87,20 +92,16 @@ func TestMigrator(t *testing.T) {
 			Return(db).
 			Once()
 
-		dbService.On("GetDbName").
-			Return("test").
-			Once()
-
-		mock.ExpectExec("SELECT 1").
+		mock.ExpectExec(testQuery).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		mock.ExpectQuery("SELECT (.+) FROM (.+)?information_schema.tables(.+)?").
+		mock.ExpectQuery(testInfoTablesQuery).
 			WillReturnError(assert.AnError)
 
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx, "SELECT 1")
+		err = migrator.Migrate(ctx, testQuery)
 
 		// Assert
 		assert.Error(t, err)
@@ -122,20 +123,16 @@ func TestMigrator(t *testing.T) {
 			Return(db).
 			Once()
 
-		dbService.On("GetDbName").
-			Return("test").
-			Once()
-
-		mock.ExpectExec("SELECT 1").
+		mock.ExpectExec(testQuery).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		mock.ExpectQuery("SELECT (.+) FROM (.+)?information_schema.tables(.+)?").
+		mock.ExpectQuery(testInfoTablesQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"table_name"}).AddRow(nil))
 
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx, "SELECT 1")
+		err = migrator.Migrate(ctx, testQuery)
 
 		// Assert
 		assert.Error(t, err)

@@ -27,8 +27,6 @@ func (m *Migrator) Migrate(ctx context.Context, query string) error {
 		return err
 	}
 
-	slog.InfoContext(ctx, "migration completed", "database", m.DbService.GetDbName())
-
 	rows, err := dbInstance.Query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
 	if err != nil {
 		return err
@@ -45,7 +43,7 @@ func (m *Migrator) Migrate(ctx context.Context, query string) error {
 		tableNames = append(tableNames, tableName)
 	}
 
-	slog.InfoContext(ctx, "tables founded after migration", "tables", tableNames)
+	slog.InfoContext(ctx, "tables founded after migration", "database", m.DbService.GetDbName(), "tables", tableNames)
 
 	return nil
 }
