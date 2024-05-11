@@ -2,20 +2,30 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"log/slog"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/jfelipearaujo-org/lambda-migrator/internal/adapter/database"
+	"github.com/jfelipearaujo-org/lambda-migrator/internal/environment"
 	"github.com/jfelipearaujo-org/lambda-migrator/internal/environment/loader"
-	"github.com/jfelipearaujo-org/lambda-migrator/internal/service"
-	"github.com/jfelipearaujo-org/lambda-migrator/internal/service/orders_db"
-	"github.com/jfelipearaujo-org/lambda-migrator/internal/service/payments_db"
-	"github.com/jfelipearaujo-org/lambda-migrator/internal/service/productions_db"
+	"github.com/jfelipearaujo-org/lambda-migrator/internal/service/migrator"
 )
 
-const (
-	SQL_DB_ENGINE = "postgres"
-)
+type MigrateConfig struct {
+	DbEngine string
+	DbConfig *environment.DatabaseConfig
+	Query    string
+}
+
+//go:embed scripts/orders_db_init.sql
+var queryOrderDbInit string
+
+//go:embed scripts/payments_db_init.sql
+var queryPaymentsDbInit string
+
+//go:embed scripts/productions_db_init.sql
+var queryProductionsDbInit string
 
 func handler(ctx context.Context) error {
 	loader := loader.NewLoader()
@@ -25,36 +35,42 @@ func handler(ctx context.Context) error {
 		return err
 	}
 
-	ordersDb, err := database.NewDbSQLService(ctx, SQL_DB_ENGINE, config.DbOrdersConfig.Name, config.DbOrdersConfig.Url)
-	if err != nil {
-		return err
+	migrationConfigs := []MigrateConfig{
+		{
+			DbEngine: "postgres",
+			DbConfig: config.DbOrdersConfig,
+			Query:    queryOrderDbInit,
+		},
+		{
+			DbEngine: "postgres",
+			DbConfig: config.DbPaymentsConfig,
+			Query:    queryPaymentsDbInit,
+		},
+		{
+			DbEngine: "postgres",
+			DbConfig: config.DbProductionsConfig,
+			Query:    queryProductionsDbInit,
+		},
 	}
 
-	paymentsDb, err := database.NewDbSQLService(ctx, SQL_DB_ENGINE, config.DbPaymentsConfig.Name, config.DbPaymentsConfig.Url)
-	if err != nil {
-		return err
-	}
+	for _, migrationConfig := range migrationConfigs {
+		slog.InfoContext(ctx, "starting migration", "engine", migrationConfig.DbEngine, "database", migrationConfig.DbConfig.Name)
 
-	productionsDb, err := database.NewDbSQLService(ctx, SQL_DB_ENGINE, config.DbProductionsConfig.Name, config.DbProductionsConfig.Url)
-	if err != nil {
-		return err
-	}
-
-	migrators := []service.Migrator{
-		orders_db.NewMigrator(ordersDb),
-		payments_db.NewMigrator(paymentsDb),
-		productions_db.NewMigrator(productionsDb),
-	}
-
-	slog.InfoContext(ctx, "starting migration", "migrators", migrators)
-
-	for _, migrator := range migrators {
-		if err := migrator.Migrate(ctx); err != nil {
-			return err
+		db, err := database.NewDbSQLService(ctx, migrationConfig.DbEngine, migrationConfig.DbConfig.Name, migrationConfig.DbConfig.Url)
+		if err != nil {
+			slog.ErrorContext(ctx, "error creating database service", "error", err)
+			continue // we don't want to stop the migration if one of the databases fails
 		}
-	}
 
-	slog.InfoContext(ctx, "migration completed")
+		migrator := migrator.NewMigrator(db)
+
+		if err := migrator.Migrate(ctx, migrationConfig.Query); err != nil {
+			slog.ErrorContext(ctx, "error migrating database", "error", err)
+			continue
+		}
+
+		slog.InfoContext(ctx, "migration completed", "engine", migrationConfig.DbEngine, "database", migrationConfig.DbConfig.Name)
+	}
 
 	return nil
 }

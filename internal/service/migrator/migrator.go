@@ -1,4 +1,4 @@
-package orders_db
+package migrator
 
 import (
 	"context"
@@ -13,16 +13,13 @@ type Migrator struct {
 	DbService database.DatabaseSQLService
 }
 
-//go:embed db.sql
-var query string
-
 func NewMigrator(dbService database.DatabaseSQLService) *Migrator {
 	return &Migrator{
 		DbService: dbService,
 	}
 }
 
-func (m *Migrator) Migrate(ctx context.Context) error {
+func (m *Migrator) Migrate(ctx context.Context, query string) error {
 	dbInstance := m.DbService.GetInstance()
 
 	_, err := dbInstance.Exec(query)

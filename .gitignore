@@ -48,3 +48,6 @@ terraform.rc
 
 # env file
 .env
+
+# coverage
+coverage.out

@@ -1,4 +1,4 @@
-package orders_db
+package migrator
 
 import (
 	"context"
@@ -37,7 +37,7 @@ func TestMigrator(t *testing.T) {
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx)
+		err = migrator.Migrate(ctx, "SELECT 1")
 
 		// Assert
 		assert.NoError(t, err)
@@ -65,7 +65,7 @@ func TestMigrator(t *testing.T) {
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx)
+		err = migrator.Migrate(ctx, "SELECT 1")
 
 		// Assert
 		assert.Error(t, err)
@@ -100,7 +100,7 @@ func TestMigrator(t *testing.T) {
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx)
+		err = migrator.Migrate(ctx, "SELECT 1")
 
 		// Assert
 		assert.Error(t, err)
@@ -135,7 +135,7 @@ func TestMigrator(t *testing.T) {
 		migrator := NewMigrator(dbService)
 
 		// Act
-		err = migrator.Migrate(ctx)
+		err = migrator.Migrate(ctx, "SELECT 1")
 
 		// Assert
 		assert.Error(t, err)
