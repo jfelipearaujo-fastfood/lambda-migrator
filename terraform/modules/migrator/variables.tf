@@ -3,33 +3,7 @@ variable "lambda_name" {
   description = "The name of the lambda function"
 }
 
-variable "db_host" {
+variable "vpc_name" {
   type        = string
-  description = "The hostname of the database"
-}
-
-variable "db_port" {
-  type        = number
-  description = "The port of the database"
-}
-
-variable "db_name" {
-  type        = string
-  description = "The name of the database"
-  default     = "fastfood"
-}
-
-variable "db_username" {
-  type        = string
-  description = "The username for the database"
-}
-
-variable "security_group_id" {
-  type        = string
-  description = "The ID of the security group"
-}
-
-variable "private_subnets" {
-  type        = list(string)
-  description = "The IDs of the private subnets"
+  description = "The name of the VPC"
 }

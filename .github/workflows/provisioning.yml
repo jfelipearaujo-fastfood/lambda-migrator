@@ -19,7 +19,7 @@ jobs:
           go-version: ${{ vars.GO_VERSION }}
 
       - name: Test
-        run: go test -v ./...
+        run: go test -race -count=1 ./internal/...
 
   build:
     name: Build and Package
@@ -35,7 +35,7 @@ jobs:
           go-version: ${{ vars.GO_VERSION }}
 
       - name: Build
-        run: env GOOS=linux GOARCH=arm64 go build -o bootstrap main.go
+        run: env GOOS=linux GOARCH=arm64 go build -o bootstrap cmd/main.go
 
       - name: Package
         run: zip lambda.zip bootstrap

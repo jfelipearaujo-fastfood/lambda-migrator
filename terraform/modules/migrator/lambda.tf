@@ -1,11 +1,3 @@
-data "aws_secretsmanager_secret" "master_user_secret" {
-  name = "db-${var.db_name}-secret"
-}
-
-data "aws_secretsmanager_secret_version" "master_user_secret_version" {
-  secret_id = data.aws_secretsmanager_secret.master_user_secret.arn
-}
-
 resource "aws_lambda_function" "lambda_function" {
   function_name = "lambda_${var.lambda_name}"
 
@@ -19,11 +11,14 @@ resource "aws_lambda_function" "lambda_function" {
 
   environment {
     variables = {
-      DB_HOST = var.db_host
-      DB_PORT = var.db_port
-      DB_NAME = var.db_name
-      DB_USER = var.db_username
-      DB_PASS = jsondecode(data.aws_secretsmanager_secret_version.master_user_secret_version.secret_string)["password"]
+      DB_PRODUCTS_NAME    = "products"
+      DB_PRODUCTS_URL     = data.aws_secretsmanager_secret_version.db_products_url_secret_version.secret_string
+      DB_ORDERS_NAME      = "orders"
+      DB_ORDERS_URL       = data.aws_secretsmanager_secret_version.db_orders_url_secret_version.secret_string
+      DB_PAYMENTS_NAME    = "payments"
+      DB_PAYMENTS_URL     = data.aws_secretsmanager_secret_version.db_payments_url_secret_version.secret_string
+      DB_PRODUCTIONS_NAME = "productions"
+      DB_PRODUCTIONS_URL  = data.aws_secretsmanager_secret_version.db_productions_url_secret_version.secret_string
     }
   }
 
@@ -31,7 +26,12 @@ resource "aws_lambda_function" "lambda_function" {
 
   vpc_config {
     ipv6_allowed_for_dual_stack = false
-    subnet_ids                  = var.private_subnets
-    security_group_ids          = [var.security_group_id]
+    subnet_ids                  = data.aws_subnets.private_subnets.ids
+    security_group_ids = [
+      data.aws_db_subnet_group.private_subnet_group_productions_db.security_group_id,
+      data.aws_db_subnet_group.private_subnet_group_products_db.security_group_id,
+      data.aws_db_subnet_group.private_subnet_group_orders_db.security_group_id,
+      data.aws_db_subnet_group.private_subnet_group_payments_db.security_group_id
+    ]
   }
 }
