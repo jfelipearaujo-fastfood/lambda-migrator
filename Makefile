@@ -285,4 +285,12 @@ destroy:
 	@cd terraform \
 		&& terraform destroy -auto-approve
 
+build-binary:
+	@echo "Building..."
+	@env GOOS=linux GOARCH=arm64 go build -o terraform/bootstrap cmd/main.go
+
+zip-binary:
+	@echo "Zipping..."
+	@zip terraform/lambda.zip terraform/bootstrap
+
 .PHONY: build run test clean

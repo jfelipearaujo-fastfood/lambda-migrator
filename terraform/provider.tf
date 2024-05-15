@@ -10,7 +10,7 @@ terraform {
 
   backend "s3" {
     region = "us-east-1"
-    key    = "terraform/database/terraform.tfstate"
+    key    = "terraform/lambda-migrator/terraform.tfstate"
   }
 }
 

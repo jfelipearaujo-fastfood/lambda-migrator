@@ -27,11 +27,6 @@ resource "aws_lambda_function" "lambda_function" {
   vpc_config {
     ipv6_allowed_for_dual_stack = false
     subnet_ids                  = data.aws_subnets.private_subnets.ids
-    security_group_ids = [
-      data.aws_db_subnet_group.private_subnet_group_productions_db.security_group_id,
-      data.aws_db_subnet_group.private_subnet_group_products_db.security_group_id,
-      data.aws_db_subnet_group.private_subnet_group_orders_db.security_group_id,
-      data.aws_db_subnet_group.private_subnet_group_payments_db.security_group_id
-    ]
+    security_group_ids          = data.aws_security_groups.dbs_subnet_groups.ids
   }
 }
