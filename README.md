@@ -1,10 +1,45 @@
-# Fast-Food Database
+# Lambda Migrator
 
-This project its responsible for provisioning a database in AWS using Terraform. The database will be a PostgreSQL instance and it will be created in a VPC. The database will be created in a private subnet and it will be accessed by a lambda function that will be responsible for running the database migrations.
+Repository responsible for the creation of the Lambda that will be used to execute any databases migration.
 
-## Diagram
+# Local Development
 
-![diagram](./docs/diagrams/cloud_aws_database_migrations.png)
+## Requirements
+
+- [Terraform](https://www.terraform.io/downloads.html)
+- [Terraform Docs](https://github.com/terraform-docs/terraform-docs)
+- [AWS CLI](https://aws.amazon.com/cli/)
+- [Python 3](https://www.python.org/downloads/)
+
+## Manual deployment
+
+### Attention
+
+Before deploying the Lambda, make sure to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
+
+Be aware that this process will take a few minutes (~5 minutes) to be completed.
+
+To deploy the Lambda manually, run the following commands in order:
+
+```bash
+make init
+make check # this will execute fmt, validate and plan
+make apply
+```
+
+To destroy the Lambda, run the following command:
+
+```bash
+make destroy
+```
+
+## Automated deployment
+
+The automated deployment is triggered by a GitHub Action.
+
+# Diagram of the complete infrastructure
+
+![diagram](./docs/cloud_aws_database_migrations.png)
 
 ## Terraform
 
@@ -40,8 +75,3 @@ No resources.
 
 No outputs.
 <!-- END_TF_DOCS -->
-
-## Modules
-
-- [database](./docs/database.md)
-- [migrator](./docs/migrator.md)

@@ -30,8 +30,9 @@ with Diagram(diagram_label, show=False, graph_attr=diagram_attr, direction="LR")
 
     with Cluster("AWS", graph_attr=cluster_attr):
         lambda_function = Lambda("Lambda Migrator", **item_attr)
-        rds = RDS("RDS", **item_attr)
 
         github >> lambda_function
         
-        lambda_function >> rds
+        lambda_function >> RDS("Orders DB", **item_attr)
+        lambda_function >> RDS("Payments DB", **item_attr)
+        lambda_function >> RDS("Productions DB", **item_attr)
