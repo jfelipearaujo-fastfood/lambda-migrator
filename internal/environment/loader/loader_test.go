@@ -19,6 +19,8 @@ func cleanEnv() {
 	os.Unsetenv("DB_PAYMENTS_NAME")
 	os.Unsetenv("DB_PRODUCTIONS_URL")
 	os.Unsetenv("DB_PRODUCTIONS_NAME")
+	os.Unsetenv("DB_CUSTOMERS_URL")
+	os.Unsetenv("DB_CUSTOMERS_NAME")
 }
 
 func TestGetEnvironment(t *testing.T) {
@@ -32,6 +34,8 @@ func TestGetEnvironment(t *testing.T) {
 		t.Setenv("DB_PAYMENTS_NAME", "payment_db")
 		t.Setenv("DB_PRODUCTIONS_URL", "db://host:1234")
 		t.Setenv("DB_PRODUCTIONS_NAME", "production_db")
+		t.Setenv("DB_CUSTOMERS_URL", "db://host:1234")
+		t.Setenv("DB_CUSTOMERS_NAME", "customer_db")
 
 		expected := &environment.Config{
 			DbProductsConfig: &environment.DatabaseConfig{
@@ -48,6 +52,10 @@ func TestGetEnvironment(t *testing.T) {
 			},
 			DbProductionsConfig: &environment.DatabaseConfig{
 				Name: "production_db",
+				Url:  "db://host:1234",
+			},
+			DbCustomersConfig: &environment.DatabaseConfig{
+				Name: "customer_db",
 				Url:  "db://host:1234",
 			},
 		}
@@ -97,6 +105,10 @@ func TestGetEnvironmentFromFile(t *testing.T) {
 			},
 			DbProductionsConfig: &environment.DatabaseConfig{
 				Name: "production_db",
+				Url:  "db://host:1234",
+			},
+			DbCustomersConfig: &environment.DatabaseConfig{
+				Name: "customer_db",
 				Url:  "db://host:1234",
 			},
 		}

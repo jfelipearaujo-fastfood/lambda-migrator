@@ -64,6 +64,9 @@ var queryPaymentsDbInit string
 //go:embed testdata/productions_db_init.sql
 var queryProductionsDbInit string
 
+//go:embed testdata/customers_db_init.sql
+var queryCustomersDbInit string
+
 const featureKey CtxKeyType = "feature"
 
 type feature struct {
@@ -90,6 +93,11 @@ func iHaveToMigrateTheDatabases(ctx context.Context) (context.Context, error) {
 		return ctx, fmt.Errorf("failed to ping productions database: %w", err)
 	}
 
+	err = pingDatabase(ctx, feat.urls["customer"])
+	if err != nil {
+		return ctx, fmt.Errorf("failed to ping customers database: %w", err)
+	}
+
 	return ctx, nil
 }
 
@@ -111,13 +119,20 @@ func iMigrateTheDatabases(ctx context.Context) (context.Context, error) {
 		return ctx, fmt.Errorf("error creating database service: %v", err)
 	}
 
+	customersDbService, err := database.NewDbSQLService(ctx, dbEngine, "customers", feat.urls["customer"])
+	if err != nil {
+		return ctx, fmt.Errorf("error creating database service: %v", err)
+	}
+
 	handler := handler.NewHandler(
 		ordersDbService,
 		paymentsDbService,
 		productionsDbService,
+		customersDbService,
 		queryOrderDbInit,
 		queryPaymentsDbInit,
 		queryProductionsDbInit,
+		queryCustomersDbInit,
 	)
 
 	return ctx, handler.Handle(ctx)
@@ -129,6 +144,7 @@ func theDatabasesShouldBeMigrated(ctx context.Context) (context.Context, error) 
 	expectedOrdersTables := []string{"orders", "order_items", "order_payments"}
 	expectedPaymentsTables := []string{"payments", "payment_items"}
 	expectedProductionsTables := []string{"orders", "order_items"}
+	expectedCustomersTables := []string{"customers"}
 
 	ordersTableNames, err := getDatabaseTables(ctx, feat.urls["order"])
 	if err != nil {
@@ -145,6 +161,11 @@ func theDatabasesShouldBeMigrated(ctx context.Context) (context.Context, error) 
 		return ctx, fmt.Errorf("failed to get productions tables: %w", err)
 	}
 
+	customersTableNames, err := getDatabaseTables(ctx, feat.urls["customer"])
+	if err != nil {
+		return ctx, fmt.Errorf("failed to get customers tables: %w", err)
+	}
+
 	if !reflect.DeepEqual(expectedOrdersTables, ordersTableNames) {
 		return ctx, fmt.Errorf("expected orders tables %v, got %v", expectedOrdersTables, ordersTableNames)
 	}
@@ -155,6 +176,10 @@ func theDatabasesShouldBeMigrated(ctx context.Context) (context.Context, error) 
 
 	if !reflect.DeepEqual(expectedProductionsTables, productionsTableNames) {
 		return ctx, fmt.Errorf("expected productions tables %v, got %v", expectedProductionsTables, productionsTableNames)
+	}
+
+	if !reflect.DeepEqual(expectedCustomersTables, customersTableNames) {
+		return ctx, fmt.Errorf("expected customers tables %v, got %v", expectedCustomersTables, customersTableNames)
 	}
 
 	return ctx, nil
@@ -231,12 +256,18 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 			return ctx, err
 		}
 
+		customersContainer, ctx, err := createPostgresContainer(ctx, network, "customer")
+		if err != nil {
+			return ctx, err
+		}
+
 		containers[sc.Id] = testContext{
 			network: network,
 			containers: []testcontainers.Container{
 				ordersContainer,
 				paymentsContainer,
 				productionsContainer,
+				customersContainer,
 			},
 		}
 

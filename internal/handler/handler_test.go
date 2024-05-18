@@ -35,6 +35,10 @@ func TestHandle(t *testing.T) {
 		productionsDbService.On("GetDbName").Return("productions").Once()
 		productionsDbService.On("GetInstance").Return(db).Once()
 
+		customersDbService := mocks.NewMockDatabaseSQLService(t)
+		customersDbService.On("GetDbName").Return("customers").Once()
+		customersDbService.On("GetInstance").Return(db).Once()
+
 		mock.ExpectExec(testQuery).WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectQuery(testInfoTablesQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"table_name"}).AddRow("orders"))
@@ -47,10 +51,16 @@ func TestHandle(t *testing.T) {
 		mock.ExpectQuery(testInfoTablesQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"table_name"}).AddRow("productions"))
 
+		mock.ExpectExec(testQuery).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectQuery(testInfoTablesQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"table_name"}).AddRow("customers"))
+
 		handler := NewHandler(
 			ordersDbService,
 			paymentsDbService,
 			productionsDbService,
+			customersDbService,
+			testQuery,
 			testQuery,
 			testQuery,
 			testQuery,
@@ -87,6 +97,10 @@ func TestHandle(t *testing.T) {
 		productionsDbService.On("GetDbName").Return("productions").Once()
 		productionsDbService.On("GetInstance").Return(db).Once()
 
+		customersDbService := mocks.NewMockDatabaseSQLService(t)
+		customersDbService.On("GetDbName").Return("customers").Once()
+		customersDbService.On("GetInstance").Return(db).Once()
+
 		mock.ExpectExec(testQuery).WillReturnError(assert.AnError)
 		mock.ExpectExec(testQuery).WillReturnError(assert.AnError)
 		mock.ExpectExec(testQuery).WillReturnError(assert.AnError)
@@ -95,6 +109,8 @@ func TestHandle(t *testing.T) {
 			ordersDbService,
 			paymentsDbService,
 			productionsDbService,
+			customersDbService,
+			testQuery,
 			testQuery,
 			testQuery,
 			testQuery,

@@ -12,28 +12,34 @@ type Handler struct {
 	ordersDbService      database.DatabaseSQLService
 	paymentsDbService    database.DatabaseSQLService
 	productionsDbService database.DatabaseSQLService
+	customersDbService   database.DatabaseSQLService
 
 	queryOrdersDbInit      string
 	queryPaymentsDbInit    string
 	queryProductionsDbInit string
+	queryCustomersDbInit   string
 }
 
 func NewHandler(
 	ordersDbService database.DatabaseSQLService,
 	paymentsDbService database.DatabaseSQLService,
 	productionsDbService database.DatabaseSQLService,
+	customersDbService database.DatabaseSQLService,
 	queryOrdersDbInit string,
 	queryPaymentsDbInit string,
 	queryProductionsDbInit string,
+	queryCustomersDbInit string,
 ) *Handler {
 	return &Handler{
 		ordersDbService:      ordersDbService,
 		paymentsDbService:    paymentsDbService,
 		productionsDbService: productionsDbService,
+		customersDbService:   customersDbService,
 
 		queryOrdersDbInit:      queryOrdersDbInit,
 		queryPaymentsDbInit:    queryPaymentsDbInit,
 		queryProductionsDbInit: queryProductionsDbInit,
+		queryCustomersDbInit:   queryCustomersDbInit,
 	}
 }
 
@@ -53,6 +59,11 @@ func (h *Handler) Handle(ctx context.Context) error {
 	err = runMigration(ctx, h.productionsDbService, h.queryProductionsDbInit)
 	if err != nil {
 		slog.ErrorContext(ctx, "error migrating database", "database", h.productionsDbService.GetDbName(), "error", err)
+	}
+
+	err = runMigration(ctx, h.customersDbService, h.queryCustomersDbInit)
+	if err != nil {
+		slog.ErrorContext(ctx, "error migrating database", "database", h.customersDbService.GetDbName(), "error", err)
 	}
 
 	return nil

@@ -14,6 +14,7 @@ type Config struct {
 	DbOrdersConfig      *DatabaseConfig `env:",prefix=DB_ORDERS_"`
 	DbPaymentsConfig    *DatabaseConfig `env:",prefix=DB_PAYMENTS_"`
 	DbProductionsConfig *DatabaseConfig `env:",prefix=DB_PRODUCTIONS_"`
+	DbCustomersConfig   *DatabaseConfig `env:",prefix=DB_CUSTOMERS_"`
 }
 
 type Environment interface {
