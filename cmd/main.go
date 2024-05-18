@@ -22,6 +22,9 @@ var queryPaymentsDbInit string
 //go:embed scripts/productions_db_init.sql
 var queryProductionsDbInit string
 
+//go:embed scripts/customers_db_init.sql
+var queryCustomersDbInit string
+
 func main() {
 	ctx := context.Background()
 
@@ -47,13 +50,20 @@ func main() {
 		slog.Error("error creating database service", "error", err)
 	}
 
+	customersDbService, err := database.NewDbSQLService(ctx, dbEngine, config.DbCustomersConfig.Name, config.DbCustomersConfig.Url)
+	if err != nil {
+		slog.Error("error creating database service", "error", err)
+	}
+
 	handler := handler.NewHandler(
 		ordersDbService,
 		paymentsDbService,
 		productionsDbService,
+		customersDbService,
 		queryOrderDbInit,
 		queryPaymentsDbInit,
 		queryProductionsDbInit,
+		queryCustomersDbInit,
 	)
 
 	lambda.Start(handler.Handle)
