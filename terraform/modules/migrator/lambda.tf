@@ -19,6 +19,8 @@ resource "aws_lambda_function" "lambda_function" {
       DB_PAYMENTS_URL     = data.aws_secretsmanager_secret_version.db_payments_url_secret_version.secret_string
       DB_PRODUCTIONS_NAME = "productions"
       DB_PRODUCTIONS_URL  = data.aws_secretsmanager_secret_version.db_productions_url_secret_version.secret_string
+      DB_CUSTOMERS_NAME   = "customers"
+      DB_CUSTOMERS_URL    = data.aws_secretsmanager_secret_version.db_customers_url_secret_version.secret_string
     }
   }
 

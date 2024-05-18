@@ -30,3 +30,10 @@ data "aws_secretsmanager_secret_version" "db_productions_url_secret_version" {
   secret_id = data.aws_secretsmanager_secret.db_productions_url_secret.arn
 }
 
+data "aws_secretsmanager_secret" "db_customers_url_secret" {
+  name = "db-customers-url-secret"
+}
+
+data "aws_secretsmanager_secret_version" "db_customers_url_secret_version" {
+  secret_id = data.aws_secretsmanager_secret.db_customers_url_secret.arn
+}
