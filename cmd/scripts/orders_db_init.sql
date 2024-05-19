@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS order_payments;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+
 CREATE TABLE IF NOT EXISTS orders (
     id varchar(255),
     customer_id varchar(255),
