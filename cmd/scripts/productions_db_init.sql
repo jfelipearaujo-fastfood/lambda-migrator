@@ -16,5 +16,4 @@ CREATE TABLE IF NOT EXISTS order_items (
     name varchar(255),
     quantity int,
     PRIMARY KEY (id, order_id)
-    FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );

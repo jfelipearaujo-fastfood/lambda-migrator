@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS orders (
     customer_id varchar(255),
     track_id varchar(255),
     state int,
-    state_updated_at TIMESTAMP,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
+    state_updated_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY (id)
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS order_payments (
     total_items int,
     amount DECIMAL(10, 2),
     state int,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY (order_id, payment_id)
 );

@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS payments (
     total_items int,
     amount DECIMAL(10, 2),
     state int,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY (order_id, payment_id)
 );
 
