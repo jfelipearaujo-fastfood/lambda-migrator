@@ -13,6 +13,7 @@
 
 # Build file
 bootstrap
+build
 
 # Crash log files
 crash.log

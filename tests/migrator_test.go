@@ -3,56 +3,26 @@ package tests
 import (
 	"context"
 	"database/sql"
-	"flag"
 	"fmt"
-	"os"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/cucumber/godog"
-	"github.com/cucumber/godog/colors"
 	"github.com/jfelipearaujo-org/lambda-migrator/internal/adapter/database"
 	"github.com/jfelipearaujo-org/lambda-migrator/internal/handler"
+	"github.com/jfelipearaujo/testcontainers/pkg/container"
+	"github.com/jfelipearaujo/testcontainers/pkg/container/postgres"
+	"github.com/jfelipearaujo/testcontainers/pkg/network"
+	"github.com/jfelipearaujo/testcontainers/pkg/state"
+	"github.com/jfelipearaujo/testcontainers/pkg/testsuite"
 	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/network"
-	"github.com/testcontainers/testcontainers-go/wait"
 
 	_ "embed"
 
 	_ "github.com/lib/pq"
 )
 
-var opts = godog.Options{
-	Format:      "pretty",
-	Paths:       []string{"features"},
-	Output:      colors.Colored(os.Stdout),
-	Concurrency: 4,
-}
-
-func init() {
-	godog.BindFlags("godog.", flag.CommandLine, &opts)
-}
-
-func TestFeatures(t *testing.T) {
-	o := opts
-	o.TestingT = t
-
-	status := godog.TestSuite{
-		ScenarioInitializer: InitializeScenario,
-		Options:             &o,
-	}.Run()
-
-	if status == 2 {
-		t.SkipNow()
-	}
-
-	if status != 0 {
-		t.Fatalf("zero status code expected, %d received", status)
-	}
-}
-
-// Steps
 const dbEngine string = "postgres"
 
 //go:embed testdata/orders_db_init.sql
@@ -67,16 +37,74 @@ var queryProductionsDbInit string
 //go:embed testdata/customers_db_init.sql
 var queryCustomersDbInit string
 
-const featureKey CtxKeyType = "feature"
-
 type feature struct {
 	urls map[string]string
 }
 
-var state = NewState[feature](featureKey)
+var testState = state.NewState[feature]()
+
+var containers = container.NewGroup()
+
+func TestFeatures(t *testing.T) {
+	testsuite.NewTestSuite(t,
+		initializeScenario,
+		testsuite.WithPaths("features"),
+		testsuite.WithConcurrency(0),
+	)
+}
+
+func initializeScenario(ctx *godog.ScenarioContext) {
+	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+		ntwrkDefinition := network.NewNetwork()
+
+		network, err := ntwrkDefinition.Build(ctx)
+		if err != nil {
+			return ctx, fmt.Errorf("failed to build the network: %w", err)
+		}
+
+		ordersContainer, ctx, err := createPostgresContainer(ctx, ntwrkDefinition, network, "order")
+		if err != nil {
+			return ctx, err
+		}
+
+		paymentsContainer, ctx, err := createPostgresContainer(ctx, ntwrkDefinition, network, "payment")
+		if err != nil {
+			return ctx, err
+		}
+
+		productionsContainer, ctx, err := createPostgresContainer(ctx, ntwrkDefinition, network, "production")
+		if err != nil {
+			return ctx, err
+		}
+
+		customersContainer, ctx, err := createPostgresContainer(ctx, ntwrkDefinition, network, "customer")
+		if err != nil {
+			return ctx, err
+		}
+
+		containers[sc.Id] = container.BuildGroupContainer(
+			container.WithDockerContainer(ordersContainer),
+			container.WithDockerContainer(paymentsContainer),
+			container.WithDockerContainer(productionsContainer),
+			container.WithDockerContainer(customersContainer),
+		)
+
+		return ctx, nil
+	})
+
+	ctx.Step(`^I have to migrate the databases$`, iHaveToMigrateTheDatabases)
+	ctx.Step(`^I migrate the databases$`, iMigrateTheDatabases)
+	ctx.Step(`^the databases should be migrated$`, theDatabasesShouldBeMigrated)
+
+	ctx.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
+		group := containers[sc.Id]
+
+		return container.DestroyGroup(ctx, group)
+	})
+}
 
 func iHaveToMigrateTheDatabases(ctx context.Context) (context.Context, error) {
-	feat := state.retrieve(ctx)
+	feat := testState.Retrieve(ctx)
 
 	err := pingDatabase(ctx, feat.urls["order"])
 	if err != nil {
@@ -102,7 +130,7 @@ func iHaveToMigrateTheDatabases(ctx context.Context) (context.Context, error) {
 }
 
 func iMigrateTheDatabases(ctx context.Context) (context.Context, error) {
-	feat := state.retrieve(ctx)
+	feat := testState.Retrieve(ctx)
 
 	ordersDbService, err := database.NewDbSQLService(ctx, dbEngine, "orders", feat.urls["order"])
 	if err != nil {
@@ -139,7 +167,7 @@ func iMigrateTheDatabases(ctx context.Context) (context.Context, error) {
 }
 
 func theDatabasesShouldBeMigrated(ctx context.Context) (context.Context, error) {
-	feat := state.retrieve(ctx)
+	feat := testState.Retrieve(ctx)
 
 	expectedOrdersTables := []string{"orders", "order_items", "order_payments"}
 	expectedPaymentsTables := []string{"payments", "payment_items"}
@@ -225,130 +253,48 @@ func getDatabaseTables(ctx context.Context, dbUrl string) ([]string, error) {
 	return tableNames, nil
 }
 
-type testContext struct {
-	network    *testcontainers.DockerNetwork
-	containers []testcontainers.Container
-}
-
-var (
-	containers = make(map[string]testContext)
-)
-
-func InitializeScenario(ctx *godog.ScenarioContext) {
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
-		network, err := network.New(ctx, network.WithCheckDuplicate(), network.WithDriver("bridge"))
-		if err != nil {
-			return ctx, err
-		}
-
-		ordersContainer, ctx, err := createPostgresContainer(ctx, network, "order")
-		if err != nil {
-			return ctx, err
-		}
-
-		paymentsContainer, ctx, err := createPostgresContainer(ctx, network, "payment")
-		if err != nil {
-			return ctx, err
-		}
-
-		productionsContainer, ctx, err := createPostgresContainer(ctx, network, "production")
-		if err != nil {
-			return ctx, err
-		}
-
-		customersContainer, ctx, err := createPostgresContainer(ctx, network, "customer")
-		if err != nil {
-			return ctx, err
-		}
-
-		containers[sc.Id] = testContext{
-			network: network,
-			containers: []testcontainers.Container{
-				ordersContainer,
-				paymentsContainer,
-				productionsContainer,
-				customersContainer,
-			},
-		}
-
-		return ctx, nil
-	})
-
-	ctx.Step(`^I have to migrate the databases$`, iHaveToMigrateTheDatabases)
-	ctx.Step(`^I migrate the databases$`, iMigrateTheDatabases)
-	ctx.Step(`^the databases should be migrated$`, theDatabasesShouldBeMigrated)
-
-	ctx.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
-		if err != nil {
-			return ctx, err
-		}
-
-		tc := containers[sc.Id]
-
-		for _, c := range tc.containers {
-			err := c.Terminate(ctx)
-			if err != nil {
-				return ctx, err
-			}
-		}
-
-		err = tc.network.Remove(ctx)
-
-		return ctx, err
-	})
-}
-
 func createPostgresContainer(
 	ctx context.Context,
+	ntwrkDefinition *network.Network,
 	network *testcontainers.DockerNetwork,
 	dbPrefix string,
 ) (testcontainers.Container, context.Context, error) {
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: testcontainers.ContainerRequest{
-			Image: "postgres:16.0",
-			ExposedPorts: []string{
-				"5432",
-			},
-			Env: map[string]string{
-				"POSTGRES_DB":       fmt.Sprintf("%s_db", dbPrefix),
-				"POSTGRES_USER":     dbPrefix,
-				"POSTGRES_PASSWORD": dbPrefix,
-			},
-			Networks: []string{
-				network.Name,
-			},
-			NetworkAliases: map[string][]string{
-				network.Name: {
-					"test",
-				},
-			},
-			WaitingFor: wait.ForLog("PostgreSQL init process complete; ready for start up").WithStartupTimeout(120 * time.Second),
-		},
-		Started: true,
-	})
+	dbName := fmt.Sprintf("%s_db", dbPrefix)
+
+	pgDefinition := container.NewContainerDefinition(
+		container.WithNetwork(ntwrkDefinition.Alias, network),
+		postgres.WithPostgresContainer(),
+		container.WithEnvVars(map[string]string{
+			"POSTGRES_DB":       dbName,
+			"POSTGRES_USER":     dbPrefix,
+			"POSTGRES_PASSWORD": dbPrefix,
+		}),
+		container.WithForceWaitDuration(2*time.Second),
+	)
+
+	pgContainer, err := pgDefinition.BuildContainer(ctx)
 	if err != nil {
-		return nil, ctx, fmt.Errorf("failed to start postgres container: %w", err)
+		return nil, ctx, err
 	}
 
-	postgresIp, err := container.Host(ctx)
+	connString, err := postgres.BuildExternalConnectionString(ctx,
+		pgContainer,
+		postgres.WithNetwork(ntwrkDefinition),
+		postgres.WithDatabase(dbName),
+		postgres.WithUser(dbPrefix),
+		postgres.WithPass(dbPrefix),
+	)
 	if err != nil {
-		return nil, ctx, fmt.Errorf("failed to get postgres ip: %w", err)
+		return nil, ctx, err
 	}
 
-	postgresPort, err := container.MappedPort(ctx, "5432")
-	if err != nil {
-		return nil, ctx, fmt.Errorf("failed to get postgres port: %w", err)
-	}
-
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s_db?sslmode=disable", dbPrefix, dbPrefix, postgresIp, postgresPort.Port(), dbPrefix)
-
-	feat := state.retrieve(ctx)
+	feat := testState.Retrieve(ctx)
 
 	if feat.urls == nil {
 		feat.urls = make(map[string]string)
 	}
 
-	feat.urls[dbPrefix] = connStr
+	feat.urls[dbPrefix] = connString
 
-	return container, state.enrich(ctx, feat), nil
+	return pgContainer, testState.Enrich(ctx, feat), nil
 }

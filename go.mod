@@ -6,6 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-lambda-go v1.46.0
 	github.com/cucumber/godog v0.14.1
+	github.com/jfelipearaujo/testcontainers v1.1.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/sethvargo/go-envconfig v1.0.1
