@@ -172,7 +172,7 @@ func theDatabasesShouldBeMigrated(ctx context.Context) (context.Context, error) 
 	expectedOrdersTables := []string{"orders", "order_items", "order_payments"}
 	expectedPaymentsTables := []string{"payments", "payment_items"}
 	expectedProductionsTables := []string{"orders", "order_items"}
-	expectedCustomersTables := []string{"customers"}
+	expectedCustomersTables := []string{"customers", "customer_deletion_requests"}
 
 	ordersTableNames, err := getDatabaseTables(ctx, feat.urls["order"])
 	if err != nil {
